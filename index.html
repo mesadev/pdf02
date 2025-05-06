@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
   <meta charset="UTF-8">
-  <title>แบบคำขอรับการสนับสนุนงบประมาณ2222</title>
+  <title>แบบคำขอรับการสนับสนุนงบประมาณ</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
     body {
@@ -348,43 +348,51 @@
 
   </div>
   
-
-    <!-- Add this script to ensure DOM is fully loaded before running JavaScript -->
-    <script type="text/javascript">
-      document.addEventListener('DOMContentLoaded', function () {
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbyfmJaA8EL82UBvbCfaaod3JMLdev2JcVPnmJDuxzx4M5heUz0QSHxs4AWl9-F6_3TZMQ/exec';
-        const form = document.getElementById('budgetForm');
-        const statusText = document.getElementById('status');
-  
-        // Ensure the form element is available
-     if (form) {
-      form.addEventListener('submit', e => {
-        e.preventDefault();
-        const formData = new FormData(form);
-        fetch(scriptURL, { method: 'POST', body: formData })
-          .then(response => {
-            // ตรวจสอบว่า response.ok หรือ response.redirected เป็น true หรือไม่
-            if (response.ok || response.redirected) {
-              return response.text(); // แปลง response ให้เป็นข้อความ
-            } else {
-              throw new Error('เกิดข้อผิดพลาดในการส่งข้อมูล');
-            }
-          })
-          .then(result => {
-            // แสดงข้อความที่ได้รับจาก API
-            statusText.innerText = "✅ ส่งข้อมูลเรียบร้อยแล้ว!";
-            form.reset();
-          })
-          .catch(error => {
-            statusText.innerText = "❌ ข้อผิดพลาด: " + error.message; // แสดงข้อความผิดพลาด
-          });
-      });
-    } else {
-      console.error("Form not found!"); // ถ้าไม่พบฟอร์มให้แสดงข้อผิดพลาด
+  <script type="text/javascript">
+    function serializeFormData(formData) {
+      const data = new URLSearchParams();
+      for (const pair of formData.entries()) {
+        data.append(pair[0], pair[1]);
+      }
+      return data.toString(); 
     }
-
+  
+   
+    const form = document.getElementById('budgetForm');
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbyHrU_gXvzwNytzYzm6iUBhQgGHbnensnSC79o6hCwm2Xl6buyOZ4-pV5vvdcZgaNTooQ/exec';
+  
+    form.addEventListener('submit', e => {
+      e.preventDefault(); 
+  
+      const formData = new FormData(form);
+      const serializedData = serializeFormData(formData); 
+  
+      console.log("Serialized Data: ", serializedData);  
+  
+      fetch(scriptURL, {
+        method: 'POST',
+        body: serializedData,
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded', 
+        },
+        credentials: 'same-origin', 
+      })
+      .then(response => {
+        console.log("Response: ", response);  
+        if (response.ok || response.redirected) {
+          document.getElementById('status').innerText = "ส่งข้อมูลเรียบร้อยแล้ว!";
+          form.reset();
+        } else {
+          document.getElementById('status').innerText = "เกิดข้อผิดพลาดในการส่งข้อมูล!";
+        }
+      })
+      .catch(error => {
+        console.log("Error: ", error);  
+        document.getElementById('status').innerText = "ข้อผิดพลาด: " + error.message;
       });
-    </script>
+    });
+  </script>
+  
   
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
   
