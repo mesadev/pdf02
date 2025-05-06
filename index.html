@@ -357,26 +357,32 @@
         const statusText = document.getElementById('status');
   
         // Ensure the form element is available
-        if (form) {
-          form.addEventListener('submit', e => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            fetch(scriptURL, { method: 'POST', body: formData })
-              .then(response => {
-                if (response.ok || response.redirected) {
-                  statusText.innerText = "✅ ส่งข้อมูลเรียบร้อยแล้ว!";
-                  form.reset();
-                } else {
-                  statusText.innerText = "❌ เกิดข้อผิดพลาดในการส่งข้อมูล!";
-                }
-              })
-              .catch(error => {
-                statusText.innerText = "❌ ข้อผิดพลาด: " + error.message;
-              });
+     if (form) {
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        fetch(scriptURL, { method: 'POST', body: formData })
+          .then(response => {
+            // ตรวจสอบว่า response.ok หรือ response.redirected เป็น true หรือไม่
+            if (response.ok || response.redirected) {
+              return response.text(); // แปลง response ให้เป็นข้อความ
+            } else {
+              throw new Error('เกิดข้อผิดพลาดในการส่งข้อมูล');
+            }
+          })
+          .then(result => {
+            // แสดงข้อความที่ได้รับจาก API
+            statusText.innerText = "✅ ส่งข้อมูลเรียบร้อยแล้ว!";
+            form.reset();
+          })
+          .catch(error => {
+            statusText.innerText = "❌ ข้อผิดพลาด: " + error.message; // แสดงข้อความผิดพลาด
           });
-        } else {
-          console.error("Form not found!");
-        }
+      });
+    } else {
+      console.error("Form not found!"); // ถ้าไม่พบฟอร์มให้แสดงข้อผิดพลาด
+    }
+
       });
     </script>
   
